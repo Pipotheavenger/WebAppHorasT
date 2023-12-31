@@ -1,6 +1,5 @@
 pip-upgrade
 streamlit
 st-gsheets-connection
-PIL
+Pillow
 arrow
-pandas
