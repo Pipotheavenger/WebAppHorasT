@@ -71,7 +71,7 @@ if Submit:
     else:
         #### SE crea la conexion con dropbox
         api_dropbox = st.secrets["api_dropbox"]
-        cliente = dropbox.Dropbox(api_dopbox)
+        cliente = dropbox.Dropbox(api_dropbox)
         namephoto = "/DataGabeto/"+Nombre+fecha+".png"
         respuesta = cliente.files_upload(file.getvalue(),namephoto)
         enlace = cliente.sharing_create_shared_link(namephoto)
