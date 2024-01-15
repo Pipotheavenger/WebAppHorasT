@@ -1,4 +1,5 @@
 import streamlit as st
+import dropbox
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 from PIL import Image
@@ -68,6 +69,12 @@ if Submit:
         st.error("La validación de imagen no fue correcta intente con otra fotografia")
         st.stop()
     else:
+        #### SE crea la conexion con dropbox
+        api_dropbox = st.secrets["api_dropbox"]
+        cliente = dropbox.Dropbox(api_dopbox)
+        namephoto = "/DataGabeto/"+Nombre+fecha+".png"
+        respuesta = cliente.files_upload(file.getvalue(),namephoto)
+        enlace = cliente.sharing_create_shared_link(namephoto)
         #Se crea un dataframe de pandas para empaquetar los datos
         new_data = pd.DataFrame(
             [
@@ -79,7 +86,8 @@ if Submit:
                     "HORA INICIO":Hora_inicio,
                     "HORA FIN":Hora_final,
                     "DESCRIPCION":Descripcion,
-                    "FECHA REAL":fecha
+                    "FECHA REAL":fecha,
+                    "IMAGEN":enlace.url
                 }
             ]
         )
