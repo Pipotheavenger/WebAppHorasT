@@ -4,5 +4,5 @@ st-gsheets-connection
 streamlit-extras
 Pillow
 arrow
-base64
-requests
+base64==1.0.0
+requests==2.26.0
