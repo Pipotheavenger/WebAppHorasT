@@ -70,7 +70,7 @@ if Submit:
         st.stop()
     else:
         #### SE crea la conexion con googledrive
-        CLIENT_SECRET_FILE = "prueba.jpg"
+        CLIENT_SECRET_FILE = "client_secrets.json"
         API_NAME = "drive"
         API_VERSION = "V3"
         SCOPES = ["https://www.googleapis.com/auth/drive"]
