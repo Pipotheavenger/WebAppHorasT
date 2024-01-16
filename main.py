@@ -85,7 +85,7 @@ if Submit:
             payload = {
                 'key': api_key,
                 'image': encoded_string,
-                'expiration':60
+                'expiration':60*60*24*31*2 #2 Meses en segundos
             }
 
             # Hacer la solicitud POST a la API de imgBB
