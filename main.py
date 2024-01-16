@@ -1,14 +1,12 @@
 import streamlit as st
-import numpy as np
 from streamlit_gsheets import GSheetsConnection
-import pandas as pd
-import time
-import os
 import base64
 import requests
+import pandas as pd
 import io
 from PIL import Image
 from PIL.ExifTags import TAGS
+from streamlit_extras.switch_page_button import switch_page
 import arrow #Para obtener la fecha y hora actual
 
 #Estructura del web app
