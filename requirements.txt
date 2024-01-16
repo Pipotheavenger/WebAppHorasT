@@ -4,4 +4,5 @@ st-gsheets-connection
 streamlit-extras
 Pillow
 arrow
-dropbox==11.4.0
+io
+googleapiclient
