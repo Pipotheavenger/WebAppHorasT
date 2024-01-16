@@ -1,8 +1,8 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
+import pandas as pd
 import base64
 import requests
-import pandas as pd
 import io
 from PIL import Image
 from PIL.ExifTags import TAGS
@@ -71,7 +71,7 @@ if Submit:
         st.error("La validación de imagen no fue correcta intente con otra fotografia")
         st.stop()
     else:
-        #### SE crea la conexion con ImageBB(cuenta filipo)
+        #### SE crea la conexion con dropbox
         try:
             api_key = st.secrets["api_imagebb"]
             print("el tipo es : "+ file.type)
@@ -100,8 +100,7 @@ if Submit:
                 print('Error al subir la imagen:', response.status_code)
                 respuesta = "No se pudo subir la foto"
         except:
-            respuesta = "No se pudo subir la foto"
-        
+            respuesta = "No se pudo subir la foto"        
         #Se crea un dataframe de pandas para empaquetar los datos
         new_data = pd.DataFrame(
             [
