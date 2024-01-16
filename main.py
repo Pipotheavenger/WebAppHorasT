@@ -1,7 +1,9 @@
 import streamlit as st
-import dropbox
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
+import base64
+import requests
+import io
 from PIL import Image
 from PIL.ExifTags import TAGS
 from streamlit_extras.switch_page_button import switch_page
@@ -70,11 +72,35 @@ if Submit:
         st.stop()
     else:
         #### SE crea la conexion con dropbox
-        api_dropbox = st.secrets["api_dropbox"]
-        cliente = dropbox.Dropbox(api_dropbox)
-        namephoto = "/DataGabeto/"+Nombre+fecha+".png"
-        respuesta = cliente.files_upload(file.getvalue(),namephoto)
-        enlace = cliente.sharing_create_shared_link(namephoto)
+        try:
+            api_key = st.secrets["api_imagebb"]
+            print("el tipo es : "+ file.type)
+            buffer = io.BytesIO()
+            Image.open(file).save(buffer, format='JPEG')
+            img_bytes = buffer.getvalue()
+            # Codificar los bytes de la imagen en base64
+            encoded_string = base64.b64encode(img_bytes).decode('utf-8')
+            # Definir la URL de la API y el payload de la solicitud
+            url = 'https://api.imgbb.com/1/upload'
+            payload = {
+                'key': api_key,
+                'image': encoded_string,
+                'expiration':60
+            }
+
+            # Hacer la solicitud POST a la API de imgBB
+            response = requests.post(url, data=payload)
+
+            # Verificar si la solicitud fue exitosa y obtener la respuesta
+            if response.status_code == 200:
+                #print('Imagen subida con éxito.')
+                #print(response.json())
+                respuesta = response.json()["data"]["url_viewer"]
+            else:
+                print('Error al subir la imagen:', response.status_code)
+                respuesta = "No se pudo subir la foto"
+        except:
+            respuesta = "No se pudo subir la foto"        
         #Se crea un dataframe de pandas para empaquetar los datos
         new_data = pd.DataFrame(
             [
@@ -87,14 +113,11 @@ if Submit:
                     "HORA FIN":Hora_final,
                     "DESCRIPCION":Descripcion,
                     "FECHA REAL":fecha,
-                    "IMAGEN":enlace.url
+                    "IMAGEN":respuesta
                 }
             ]
         )
 
-        updated_df = pd.concat([existing_data,new_data],ignore_index=True)
-        conn.update(worksheet="Datos",data=updated_df)
-        switch_page("final")
         updated_df = pd.concat([existing_data,new_data],ignore_index=True)
         conn.update(worksheet="Datos",data=updated_df)
         switch_page("final")
