@@ -1,10 +1,14 @@
 import streamlit as st
+import numpy as np
 from streamlit_gsheets import GSheetsConnection
-from Google import Create_Service
 import pandas as pd
+import time
+import os
+import base64
+import requests
+import io
 from PIL import Image
 from PIL.ExifTags import TAGS
-from streamlit_extras.switch_page_button import switch_page
 import arrow #Para obtener la fecha y hora actual
 
 #Estructura del web app
@@ -69,44 +73,37 @@ if Submit:
         st.error("La validación de imagen no fue correcta intente con otra fotografia")
         st.stop()
     else:
-        #### SE crea la conexion con googledrive
-        CLIENT_SECRET_FILE = "client_secrets.json"
-        API_NAME = "drive"
-        API_VERSION = "V3"
-        SCOPES = ["https://www.googleapis.com/auth/drive"]
+        #### SE crea la conexion con ImageBB(cuenta filipo)
+        try:
+            api_key = st.secrets["api_imagebb"]
+            print("el tipo es : "+ file.type)
+            buffer = io.BytesIO()
+            Image.open(file).save(buffer, format='JPEG')
+            img_bytes = buffer.getvalue()
+            # Codificar los bytes de la imagen en base64
+            encoded_string = base64.b64encode(img_bytes).decode('utf-8')
+            # Definir la URL de la API y el payload de la solicitud
+            url = 'https://api.imgbb.com/1/upload'
+            payload = {
+                'key': api_key,
+                'image': encoded_string,
+                'expiration':60
+            }
 
-        service =Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+            # Hacer la solicitud POST a la API de imgBB
+            response = requests.post(url, data=payload)
 
-        FOLDER_ID = "1Kr3N98RFVO2xcXhabyT6P64ASpz8cQEi"
-        nombre = Nombre + fecha + ".jpg"
-        mime_type = "image/jpeg"
-
-        file_metadata = {
-        "name":nombre,
-        "parents": [FOLDER_ID]
-        }
-        request_body = {
-        'role': 'reader',
-        'type': 'anyone'
-        }
-        image_bytes = io.BytesIO(file.read())
-        media = MediaIoBaseUpload(image_bytes,mimetype=mime_type)
-        archivo = service.files().create(
-        body= file_metadata,
-        media_body = media,
-        fields = "id"
-        ).execute()
-        id = archivo.get('id')
-        print(id)
-        response_permission = service.permissions().create(
-        fileId=id,
-        body=request_body
-        ).execute()
-        response_link = service.files().get(
-        fileId=id,
-        fields='webViewLink'
-        ).execute()
-        enlace = response_link['webViewLink']
+            # Verificar si la solicitud fue exitosa y obtener la respuesta
+            if response.status_code == 200:
+                #print('Imagen subida con éxito.')
+                #print(response.json())
+                respuesta = response.json()["data"]["url_viewer"]
+            else:
+                print('Error al subir la imagen:', response.status_code)
+                respuesta = "No se pudo subir la foto"
+        except:
+            respuesta = "No se pudo subir la foto"
+        
         #Se crea un dataframe de pandas para empaquetar los datos
         new_data = pd.DataFrame(
             [
@@ -119,7 +116,7 @@ if Submit:
                     "HORA FIN":Hora_final,
                     "DESCRIPCION":Descripcion,
                     "FECHA REAL":fecha,
-                    "IMAGEN":enlace
+                    "IMAGEN":respuesta
                 }
             ]
         )
