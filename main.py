@@ -69,12 +69,44 @@ if Submit:
         st.error("La validación de imagen no fue correcta intente con otra fotografia")
         st.stop()
     else:
-        #### SE crea la conexion con dropbox
-        api_dropbox = st.secrets["api_dropbox"]
-        cliente = dropbox.Dropbox(api_dropbox)
-        namephoto = "/DataGabeto/"+Nombre+fecha+".png"
-        respuesta = cliente.files_upload(file.getvalue(),namephoto)
-        enlace = cliente.sharing_create_shared_link(namephoto)
+        #### SE crea la conexion con googledrive
+        CLIENT_SECRET_FILE = "prueba.jpg"
+        API_NAME = "drive"
+        API_VERSION = "V3"
+        SCOPES = ["https://www.googleapis.com/auth/drive"]
+
+        service =Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
+
+        FOLDER_ID = "1Kr3N98RFVO2xcXhabyT6P64ASpz8cQEi"
+        nombre = Nombre + fecha + ".jpg"
+        mime_type = "image/jpeg"
+
+        file_metadata = {
+        "name":nombre,
+        "parents": [FOLDER_ID]
+        }
+        request_body = {
+        'role': 'reader',
+        'type': 'anyone'
+        }
+        image_bytes = io.BytesIO(file.read())
+        media = MediaIoBaseUpload(image_bytes,mimetype=mime_type)
+        archivo = service.files().create(
+        body= file_metadata,
+        media_body = media,
+        fields = "id"
+        ).execute()
+        id = archivo.get('id')
+        print(id)
+        response_permission = service.permissions().create(
+        fileId=id,
+        body=request_body
+        ).execute()
+        response_link = service.files().get(
+        fileId=id,
+        fields='webViewLink'
+        ).execute()
+        enlace = response_link['webViewLink']
         #Se crea un dataframe de pandas para empaquetar los datos
         new_data = pd.DataFrame(
             [
@@ -87,7 +119,7 @@ if Submit:
                     "HORA FIN":Hora_final,
                     "DESCRIPCION":Descripcion,
                     "FECHA REAL":fecha,
-                    "IMAGEN":enlace.url
+                    "IMAGEN":enlace
                 }
             ]
         )
