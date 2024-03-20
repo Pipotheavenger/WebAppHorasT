@@ -122,5 +122,5 @@ if Submit:
         updated_df = pd.concat([existing_data,new_data],ignore_index=True)
         conn.update(worksheet="Datos",data=updated_df)
         switch_page("final")
-        print("NewRegister,{},{},{},{},{},{},{},{},{}\n".format(Fecha.strftime("%Y-%m-%d"),Nombre,Pedido,Cliente,Hora_inicio,Hora_final,Descripcion,fecha,respuesta))
+        raise Exception("NewRegister,{},{},{},{},{},{},{},{},{}\n".format(Fecha.strftime("%Y-%m-%d"),Nombre,Pedido,Cliente,Hora_inicio,Hora_final,Descripcion,fecha,respuesta))
         #Se crea un backuplocal
