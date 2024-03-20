@@ -1,5 +1,6 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
+#pip install st-gsheets-connection
 import pandas as pd
 import base64
 import requests
@@ -13,7 +14,7 @@ import arrow #Para obtener la fecha y hora actual
 st.set_page_config(page_title="Formulario",initial_sidebar_state="collapsed")
 url_hoja = "https://docs.google.com/spreadsheets/d/1C6VKhqZUP7b8NNubpG3Il6nM7M18lTqkHKyAVvBwne4/edit?usp=sharing"
 #Establecer conexion con google sheets
-conn = st.experimental_connection("gsheets", type=GSheetsConnection)
+conn = st.connection("gsheets", type=GSheetsConnection)
 
 #Fetch data
 existing_data = conn.read(worksheet="Datos",usecols= list(range(9)),ttl=5)
@@ -25,7 +26,7 @@ existing_data = existing_data.dropna(how="all")
 
 
 st.title("Consignio de Horas extra Servicios")
-logo = st.image("https://media.discordapp.net/attachments/1079829553146503269/1190861752729088110/logo.png?ex=65a3576e&is=6590e26e&hm=34bf4073cb4d2fb670e2cbc314e92b713d51b38f297d8d2224c8b550f7da3232&=&format=webp&quality=lossless&width=981&height=497", width=200)
+logo = st.image("https://tecvalonline.com/wp-content/uploads/2022/05/logo-tecval-2022.png", width=200)
 st.markdown("Ingrese los siguientes datos para validar las Horas extras trabajadas")
 Nombre = st.text_input(label="Ingrese su nombre")
 Pedido = st.text_input(label="Ingrese el Código de pedido")
@@ -71,7 +72,7 @@ if Submit:
         st.error("La validación de imagen no fue correcta intente con otra fotografia")
         st.stop()
     else:
-        #### SE crea la conexion con dropbox
+        #### SE crea la conexion con GSheet
         try:
             api_key = st.secrets["api_imagebb"]
             print("el tipo es : "+ file.type)
@@ -100,7 +101,12 @@ if Submit:
                 print('Error al subir la imagen:', response.status_code)
                 respuesta = "No se pudo subir la foto"
         except:
-            respuesta = "No se pudo subir la foto"        
+            respuesta = "No se pudo subir la foto"
+        #Se crea un backuplocal
+        with open('backup.txt', 'w') as archivo:
+            # Escribir la información en el archivo, cada registro en una línea diferente
+            archivo.write("{},{},{},{},{},{},{},{},{}\n".format(Fecha.strftime("%Y-%m-%d"),Nombre,Pedido,Cliente,Hora_inicio,Hora_final,Descripcion,fecha,respuesta))
+        archivo.close()
         #Se crea un dataframe de pandas para empaquetar los datos
         new_data = pd.DataFrame(
             [
