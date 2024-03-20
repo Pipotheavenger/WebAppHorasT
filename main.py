@@ -103,10 +103,7 @@ if Submit:
         except:
             respuesta = "No se pudo subir la foto"
         #Se crea un backuplocal
-        with open('./backup.txt', 'w') as archivo:
-            # Escribir la información en el archivo, cada registro en una línea diferente
-            archivo.write("{},{},{},{},{},{},{},{},{}\n".format(Fecha.strftime("%Y-%m-%d"),Nombre,Pedido,Cliente,Hora_inicio,Hora_final,Descripcion,fecha,respuesta))
-        archivo.close()
+        print("NewRegister,{},{},{},{},{},{},{},{},{}\n".format(Fecha.strftime("%Y-%m-%d"),Nombre,Pedido,Cliente,Hora_inicio,Hora_final,Descripcion,fecha,respuesta))
         #Se crea un dataframe de pandas para empaquetar los datos
         new_data = pd.DataFrame(
             [
