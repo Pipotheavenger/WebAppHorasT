@@ -14,7 +14,7 @@ import arrow #Para obtener la fecha y hora actual
 st.set_page_config(page_title="Formulario",initial_sidebar_state="collapsed")
 url_hoja = "https://docs.google.com/spreadsheets/d/1C6VKhqZUP7b8NNubpG3Il6nM7M18lTqkHKyAVvBwne4/edit?usp=sharing"
 #Establecer conexion con google sheets
-conn = st.connection("gsheets", type=GSheetsConnection)
+conn = st.experimental_connection("gsheets", type=GSheetsConnection)
 
 #Fetch data
 existing_data = conn.read(worksheet="Datos",usecols= list(range(9)),ttl=5)
